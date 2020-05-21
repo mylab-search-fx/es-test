@@ -30,7 +30,7 @@ namespace MyLab.Elastic.Test
         /// <summary>
         /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
         /// </summary>
-        public EsIndexFixture(IConnectionProvider connectionProvider)
+        protected EsIndexFixture(IConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
             var settings = new ConnectionSettings(_connection);

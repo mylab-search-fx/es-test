@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using MyLab.Elastic;
 using MyLab.Elastic.Test;
@@ -8,10 +9,22 @@ namespace IntegrationTests
 {
     public class IndexFixtureBehavior : IClassFixture<EsIndexFixture<TestEntity>>
     {
-        [Fact]
-        public void ShouldCreateIndex()
+        private readonly EsIndexFixture<TestEntity> _fixture;
+
+        public IndexFixtureBehavior(EsIndexFixture<TestEntity> fixture)
         {
-            //Assert is exception control when fixture initialized
+            _fixture = fixture;
+        }
+
+        [Fact]
+        public async Task ShouldCreateIndex()
+        {
+            //Act
+            var indexResp = await _fixture.Manager.Client.Indices.GetAsync(_fixture.Manager.IndexName);
+            var found = indexResp.Indices.Values.FirstOrDefault();
+
+            //Assert
+            Assert.NotNull(found);
         }
     }
 }
