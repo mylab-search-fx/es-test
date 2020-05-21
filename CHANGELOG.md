@@ -5,3 +5,6 @@
 Формат лога изменений базируется на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Новое]
+
+* Добавлено EsIndexFixture для создания индекса на класс теста
+* Добавлено EsIndexFactoryFixture для создания индекса на тест
