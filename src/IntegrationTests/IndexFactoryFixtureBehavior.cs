@@ -23,7 +23,7 @@ namespace IntegrationTests
             //Act
             var indexResp = await _indexFactory.UseTmpIndex(mgr => mgr.Client.Indices.GetAsync(mgr.IndexName));
 
-            _log.LogResponse(indexResp);
+            _log.Log(indexResp);
 
             var found = indexResp.Indices.Values.FirstOrDefault();
 

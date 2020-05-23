@@ -26,7 +26,7 @@ namespace IntegrationTests
             //Act
             var indexResp = await _fixture.Manager.Client.Indices.GetAsync(_fixture.Manager.IndexName);
 
-            _log.LogResponse(indexResp);
+            _log.Log(indexResp);
 
             var found = indexResp.Indices.Values.FirstOrDefault();
 
