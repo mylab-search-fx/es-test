@@ -11,6 +11,8 @@ namespace MyLab.Elastic.Test
 
         public string IndexName { get; }
 
+        public IResponse CreationResponse { get; private set; }
+
         TmpIndexLife(ElasticClient client, string indexName)
         {
             _client = client;
@@ -31,7 +33,10 @@ namespace MyLab.Elastic.Test
             if (!res.ShardsAcknowledged)
                 throw new InvalidOperationException("Could not create index");
 
-            return new TmpIndexLife<TDoc>(client, indexName);
+            return new TmpIndexLife<TDoc>(client, indexName)
+            {
+                CreationResponse = res
+            };
         }
 
         public ValueTask DisposeAsync()

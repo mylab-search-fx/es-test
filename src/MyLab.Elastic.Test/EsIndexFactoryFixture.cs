@@ -29,7 +29,10 @@ namespace MyLab.Elastic.Test
         protected EsIndexFactoryFixture(IConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
+            
             var settings = new ConnectionSettings(_connection);
+            settings.DisableDirectStreaming();
+
             _client = new ElasticClient(settings);
         }
 

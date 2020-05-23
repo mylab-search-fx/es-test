@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace MyLab.Elastic.Test
 {
@@ -33,7 +34,10 @@ namespace MyLab.Elastic.Test
         protected EsIndexFixture(IConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
+            
             var settings = new ConnectionSettings(_connection);
+            settings.DisableDirectStreaming();
+
             _client = new ElasticClient(settings);
         }
 
