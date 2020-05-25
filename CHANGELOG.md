@@ -4,10 +4,16 @@
 
 Формат лога изменений базируется на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Новое]
+
+### Добавлено:
+
+* `EsManagerFixture` для предоставления `EsManager` с тестовым подключением
+
 ## [1.0.0] - 2020-05-23
 
 ### Добавлено
 
-* EsIndexFixture для создания индекса на класс теста
-* EsIndexFactoryFixture для создания индекса на тест
-* TestEsLogger для логирования запросов и ответов
+* `EsIndexFixture` для создания индекса на класс теста
+* `EsIndexFactoryFixture` для создания индекса на тест
+* `TestEsLogger` для логирования запросов и ответов
