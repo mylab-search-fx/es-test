@@ -20,6 +20,11 @@ namespace MyLab.Elastic.Test
         public IIndexSpecificEsManager Manager { get; private set; }
 
         /// <summary>
+        /// Test output. Set to get logs.
+        /// </summary>
+        public ITestOutputHelper Output { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
         /// </summary>
         public EsIndexFixture()
@@ -37,6 +42,11 @@ namespace MyLab.Elastic.Test
             
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
+            settings.OnRequestCompleted(details =>
+            {
+                if (Output != null)
+                    TestEsLogger.Log(Output, details);
+            });
 
             _client = new ElasticClient(settings);
         }

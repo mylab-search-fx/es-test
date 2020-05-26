@@ -1,6 +1,7 @@
 ﻿using System;
 using Elasticsearch.Net;
 using Nest;
+using Xunit.Abstractions;
 
 namespace MyLab.Elastic.Test
 {
@@ -14,7 +15,12 @@ namespace MyLab.Elastic.Test
         /// <summary>
         /// ES manager
         /// </summary>
-        public IEsManager Manager { get; set; }
+        public IEsManager Manager { get; }
+
+        /// <summary>
+        /// Test output. Set to get logs.
+        /// </summary>
+        public ITestOutputHelper Output { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="EsManagerFixture"/>
@@ -34,6 +40,11 @@ namespace MyLab.Elastic.Test
 
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
+            settings.OnRequestCompleted(details =>
+            {
+                if (Output != null)
+                    TestEsLogger.Log(Output, details);
+            });
 
             var client = new ElasticClient(settings);
             Manager = new TestEsManager(client);
