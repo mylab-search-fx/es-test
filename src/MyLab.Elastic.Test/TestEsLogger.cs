@@ -23,8 +23,7 @@ namespace MyLab.Elastic.Test
 
             if (call.RequestBodyInBytes != null)
             {
-                var reqJson = Encoding.UTF8.GetString(call.RequestBodyInBytes);
-                var formattedReqBody = FormatJson(reqJson);
+                var formattedReqBody = DumpToString(call.RequestBodyInBytes);
                 sb.AppendLine(formattedReqBody);
             }
             else
@@ -50,8 +49,7 @@ namespace MyLab.Elastic.Test
 
             if (call.ResponseBodyInBytes != null)
             {
-                var respJson = Encoding.UTF8.GetString(call.ResponseBodyInBytes);
-                var formattedRespBody = FormatJson(respJson);
+                var formattedRespBody = DumpToString(call.ResponseBodyInBytes);
                 sb.AppendLine(formattedRespBody);
             }
             else
@@ -71,10 +69,19 @@ namespace MyLab.Elastic.Test
             }
         }
 
-        private static string FormatJson(string json)
+        private static string DumpToString(byte[] data)
         {
-            dynamic parsedJson = JsonConvert.DeserializeObject(json);
-            return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+            var str = Encoding.UTF8.GetString(data);
+
+            try
+            {
+                dynamic parsedJson = JsonConvert.DeserializeObject(str);
+                return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+            }
+            catch (JsonReaderException)
+            {
+                return str;
+            }
         }
     }
 }
