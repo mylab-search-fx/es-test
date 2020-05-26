@@ -1,41 +1,29 @@
 ﻿using System;
 using System.Net;
 using System.Text;
+using Elasticsearch.Net;
 using Nest;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
 
 namespace MyLab.Elastic.Test
 {
-    /// <summary>
-    /// Logs ES events into test output
-    /// </summary>
-    public class TestEsLogger
+    static class TestEsLogger
     {
-        public ITestOutputHelper Output { get; }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="TestEsLogger"/>
-        /// </summary>
-        public TestEsLogger(ITestOutputHelper output)
+        public static void Log(ITestOutputHelper output, IApiCallDetails apiCall)
         {
-            Output = output;
-        }
-
-        public void Log(IResponse esResponse)
-        {
-            var call = esResponse.ApiCall;
+            var call = apiCall;
             var sb = new StringBuilder();
             
-            sb.AppendLine("===================================== REQUEST");
+            sb.AppendLine("# REQUEST");
             sb.AppendLine();
             sb.AppendLine($"{call.HttpMethod} {call.Uri}");
             sb.AppendLine();
 
             if (call.RequestBodyInBytes != null)
             {
-                var reqJson = Encoding.UTF8.GetString(call.RequestBodyInBytes);
-                var formattedReqBody = FormatJson(reqJson);
+                var formattedReqBody = DumpToString(call.RequestBodyInBytes);
                 sb.AppendLine(formattedReqBody);
             }
             else
@@ -44,7 +32,7 @@ namespace MyLab.Elastic.Test
             }
 
             sb.AppendLine();
-            sb.AppendLine("===================================== RESPONSE");
+            sb.AppendLine("# RESPONSE");
             sb.AppendLine();
 
             if (call.HttpStatusCode.HasValue)
@@ -61,8 +49,7 @@ namespace MyLab.Elastic.Test
 
             if (call.ResponseBodyInBytes != null)
             {
-                var respJson = Encoding.UTF8.GetString(call.ResponseBodyInBytes);
-                var formattedRespBody = FormatJson(respJson);
+                var formattedRespBody = DumpToString(call.ResponseBodyInBytes);
                 sb.AppendLine(formattedRespBody);
             }
             else
@@ -71,15 +58,30 @@ namespace MyLab.Elastic.Test
             }
 
             sb.AppendLine();
-            sb.AppendLine("===================================== END");
+            sb.AppendLine("# END");
 
-            Output.WriteLine(sb.ToString());
+            try
+            {
+                output.WriteLine(sb.ToString());
+            }
+            catch 
+            {
+            }
         }
 
-        private static string FormatJson(string json)
+        private static string DumpToString(byte[] data)
         {
-            dynamic parsedJson = JsonConvert.DeserializeObject(json);
-            return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+            var str = Encoding.UTF8.GetString(data);
+
+            try
+            {
+                dynamic parsedJson = JsonConvert.DeserializeObject(str);
+                return JsonConvert.SerializeObject(parsedJson, Formatting.Indented);
+            }
+            catch (JsonReaderException)
+            {
+                return str;
+            }
         }
     }
 }

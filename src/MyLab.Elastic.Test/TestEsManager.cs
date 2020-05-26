@@ -3,7 +3,10 @@ using Nest;
 
 namespace MyLab.Elastic.Test
 {
-    class TestEsManager : IEsManager
+    /// <summary>
+    /// Implemeents <see cref="IEsManager"/> with specified <see cref="ElasticClient"/>
+    /// </summary>
+    public class TestEsManager : IEsManager
     {
         public ElasticClient Client { get; set; }
 

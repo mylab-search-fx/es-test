@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
+using Xunit.Abstractions;
 
 namespace MyLab.Elastic.Test
 {
@@ -13,6 +14,11 @@ namespace MyLab.Elastic.Test
     {
         private readonly IConnectionPool _connection;
         private readonly ElasticClient _client;
+
+        /// <summary>
+        /// Test output. Set to get logs.
+        /// </summary>
+        public ITestOutputHelper Output { get; set; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
@@ -32,16 +38,29 @@ namespace MyLab.Elastic.Test
             
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
+            settings.OnRequestCompleted(details =>
+            {
+                if (Output != null)
+                    TestEsLogger.Log(Output, details);
+            });
 
             _client = new ElasticClient(settings);
         }
 
         /// <summary>
+        /// Creates temp index 
+        /// </summary>
+        public async Task<IAsyncDisposable> CreateTmpIndex(string tmpIndexName = null)
+        {
+            return await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
+        }
+
+        /// <summary>
         /// Creates index for the duration of action performing
         /// </summary>
-        public async Task UseTmpIndex(Func<IIndexSpecificEsManager, Task> action)
+        public async Task UseTmpIndex(Func<IIndexSpecificEsManager, Task> action, string tmpIndexName = null)
         {
-            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client);
+            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
             var mgr = new TestEsManager(_client).ForIndex(indexLife.IndexName);
 
@@ -51,9 +70,9 @@ namespace MyLab.Elastic.Test
         /// <summary>
         /// Creates index for the duration of function performing
         /// </summary>
-        public async Task<TRes> UseTmpIndex<TRes>(Func<IIndexSpecificEsManager, Task<TRes>> func)
+        public async Task<TRes> UseTmpIndex<TRes>(Func<IIndexSpecificEsManager, Task<TRes>> func, string tmpIndexName = null)
         {
-            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client);
+            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
             var mgr = new TestEsManager(_client).ForIndex(indexLife.IndexName);
 

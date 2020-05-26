@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Elasticsearch.Net;
 using Nest;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace MyLab.Elastic.Test
 {
     /// <summary>
-    /// CreateAsync tmp index with specified model mapping
+    /// Provides EsManager with test connection
     /// </summary>
-    public class EsIndexFixture<TDoc> : IAsyncLifetime
-        where TDoc : class
+    public class EsManagerFixture : IDisposable
     {
         private readonly IConnectionPool _connection;
-        private TmpIndexLife<TDoc> _index;
-        private readonly ElasticClient _client;
 
-        public IIndexSpecificEsManager Manager { get; private set; }
+        /// <summary>
+        /// ES manager
+        /// </summary>
+        public IEsManager Manager { get; }
 
         /// <summary>
         /// Test output. Set to get logs.
@@ -25,21 +23,21 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsManagerFixture"/>
         /// </summary>
-        public EsIndexFixture()
-            :this(new EnvironmentConnectionProvider())
+        public EsManagerFixture()
+            : this(new EnvironmentConnectionProvider())
         {
-            
+
         }
 
         /// <summary>
         /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
         /// </summary>
-        protected EsIndexFixture(IConnectionProvider connectionProvider)
+        protected EsManagerFixture(IConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
-            
+
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
@@ -48,18 +46,12 @@ namespace MyLab.Elastic.Test
                     TestEsLogger.Log(Output, details);
             });
 
-            _client = new ElasticClient(settings);
+            var client = new ElasticClient(settings);
+            Manager = new TestEsManager(client);
         }
 
-        public async Task InitializeAsync()
+        public void Dispose()
         {
-            _index = await TmpIndexLife<TDoc>.CreateAsync(_client);
-            Manager = new TestEsManager(_client).ForIndex(_index.IndexName);
-        }
-
-        public async Task DisposeAsync()
-        {
-            await _index.DisposeAsync();
             _connection?.Dispose();
         }
     }
