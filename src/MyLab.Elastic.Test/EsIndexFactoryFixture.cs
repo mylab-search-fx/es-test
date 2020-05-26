@@ -50,17 +50,17 @@ namespace MyLab.Elastic.Test
         /// <summary>
         /// Creates temp index 
         /// </summary>
-        public async Task<TmpIndexLife<TDoc>> CreateTmpIndex()
+        public async Task<IAsyncDisposable> CreateTmpIndex(string tmpIndexName = null)
         {
-            return await TmpIndexLife<TDoc>.CreateAsync(_client);
+            return await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
         }
 
         /// <summary>
         /// Creates index for the duration of action performing
         /// </summary>
-        public async Task UseTmpIndex(Func<IIndexSpecificEsManager, Task> action)
+        public async Task UseTmpIndex(Func<IIndexSpecificEsManager, Task> action, string tmpIndexName = null)
         {
-            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client);
+            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
             var mgr = new TestEsManager(_client).ForIndex(indexLife.IndexName);
 
@@ -70,9 +70,9 @@ namespace MyLab.Elastic.Test
         /// <summary>
         /// Creates index for the duration of function performing
         /// </summary>
-        public async Task<TRes> UseTmpIndex<TRes>(Func<IIndexSpecificEsManager, Task<TRes>> func)
+        public async Task<TRes> UseTmpIndex<TRes>(Func<IIndexSpecificEsManager, Task<TRes>> func, string tmpIndexName = null)
         {
-            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client);
+            await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
             var mgr = new TestEsManager(_client).ForIndex(indexLife.IndexName);
 

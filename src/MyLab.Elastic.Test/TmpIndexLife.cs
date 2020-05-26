@@ -4,7 +4,7 @@ using Nest;
 
 namespace MyLab.Elastic.Test
 {
-    public class TmpIndexLife<TDoc> : IAsyncDisposable
+    class TmpIndexLife<TDoc> : IAsyncDisposable
         where TDoc : class
     {
         private readonly ElasticClient _client;
@@ -21,12 +21,11 @@ namespace MyLab.Elastic.Test
 
         public static Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client)
         {
-            return CreateAsync(client, Guid.NewGuid().ToString("N"));
+            return CreateAsync(client, "test-" + Guid.NewGuid().ToString("N"));
         }
-        public static async Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client, string key)
+        
+        public static async Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client, string indexName)
         {
-            var indexName = "test-" + key;
-
             var res = await client.Indices.CreateAsync(
                 indexName, cd => cd.Map<TDoc>(md => md.AutoMap()));
 
