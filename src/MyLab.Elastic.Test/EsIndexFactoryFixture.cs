@@ -48,6 +48,14 @@ namespace MyLab.Elastic.Test
         }
 
         /// <summary>
+        /// Creates temp index 
+        /// </summary>
+        public async Task<TmpIndexLife<TDoc>> CreateTmpIndex()
+        {
+            return await TmpIndexLife<TDoc>.CreateAsync(_client);
+        }
+
+        /// <summary>
         /// Creates index for the duration of action performing
         /// </summary>
         public async Task UseTmpIndex(Func<IIndexSpecificEsManager, Task> action)

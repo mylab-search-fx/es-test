@@ -4,7 +4,7 @@ using Nest;
 
 namespace MyLab.Elastic.Test
 {
-    class TmpIndexLife<TDoc> : IAsyncDisposable
+    public class TmpIndexLife<TDoc> : IAsyncDisposable
         where TDoc : class
     {
         private readonly ElasticClient _client;
