@@ -40,9 +40,8 @@ namespace MyLab.Elastic.Test
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
-            {
-                if (Output != null)
-                    TestEsLogger.Log(Output, details);
+            { 
+                Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
 
             _client = new ElasticClient(settings);

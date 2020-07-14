@@ -42,8 +42,7 @@ namespace MyLab.Elastic.Test
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             {
-                if (Output != null)
-                    TestEsLogger.Log(Output, details);
+                Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
 
             var client = new ElasticClient(settings);
