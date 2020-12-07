@@ -8,7 +8,8 @@ namespace MyLab.Elastic.Test
     /// <summary>
     /// Provides EsManager with test connection
     /// </summary>
-    public class EsManagerFixture : IDisposable
+    public class EsManagerFixture<TConnectionProvider> : IDisposable
+        where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
 
@@ -23,18 +24,18 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsManagerFixture"/>
+        /// Initializes a new instance of <see cref="EsManagerFixture{TConnectionProvider}"/>
         /// </summary>
         public EsManagerFixture()
-            : this(new EnvironmentConnectionProvider())
+            : this(new TConnectionProvider())
         {
 
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsManagerFixture{TConnectionProvider}"/>
         /// </summary>
-        protected EsManagerFixture(IConnectionProvider connectionProvider)
+        protected EsManagerFixture(TConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
 

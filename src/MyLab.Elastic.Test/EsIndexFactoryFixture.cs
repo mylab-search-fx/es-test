@@ -9,8 +9,9 @@ namespace MyLab.Elastic.Test
     /// <summary>
     /// CreateAsync tmp index factory with specified model mapping
     /// </summary>
-    public class EsIndexFactoryFixture<TDoc> : IDisposable
+    public class EsIndexFactoryFixture<TDoc, TConnectionProvider> : IDisposable
         where TDoc : class
+        where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
         private readonly ElasticClient _client;
@@ -21,18 +22,18 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFactoryFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
         public EsIndexFactoryFixture()
-            : this(new EnvironmentConnectionProvider())
+            : this(new TConnectionProvider())
         {
 
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFactoryFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
-        protected EsIndexFactoryFixture(IConnectionProvider connectionProvider)
+        protected EsIndexFactoryFixture(TConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
             

@@ -9,7 +9,8 @@ namespace MyLab.Elastic.Test
     /// <summary>
     /// Provides manager to work with remote ES instance
     /// </summary>
-    public class EsFixture : IAsyncLifetime
+    public class EsFixture<TConnectionProvider> : IAsyncLifetime
+        where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
         private readonly ElasticClient _client;
@@ -22,18 +23,18 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsFixture{TConnectionProvider}"/>
         /// </summary>
         public EsFixture()
-            :this(new EnvironmentConnectionProvider())
+            :this(new TConnectionProvider())
         {
             
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsFixture{TConnectionProvider}"/>
         /// </summary>
-        protected EsFixture(IConnectionProvider connectionProvider)
+        protected EsFixture(TConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
             

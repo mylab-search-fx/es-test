@@ -10,8 +10,9 @@ namespace MyLab.Elastic.Test
     /// <summary>
     /// CreateAsync tmp index with specified model mapping
     /// </summary>
-    public class EsIndexFixture<TDoc> : IAsyncLifetime
+    public class EsIndexFixture<TDoc, TConnectionProvider> : IAsyncLifetime
         where TDoc : class
+        where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
         private TmpIndexLife<TDoc> _index;
@@ -25,18 +26,18 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
         public EsIndexFixture()
-            :this(new EnvironmentConnectionProvider())
+            :this(new TConnectionProvider())
         {
             
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
-        protected EsIndexFixture(IConnectionProvider connectionProvider)
+        protected EsIndexFixture(TConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
             
@@ -44,7 +45,14 @@ namespace MyLab.Elastic.Test
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             {
-                Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
+                try
+                {
+                    Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
+                }
+                catch (InvalidOperationException e)  when (e.Message == "There is no currently active test.")
+                {
+                    //Do nothing
+                }
             });
 
             _client = new ElasticClient(settings);
