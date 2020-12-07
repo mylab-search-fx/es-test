@@ -27,7 +27,7 @@ namespace MyLab.Elastic.Test
                 resultIndexName, cd => cd.Map<TDoc>(md => md.AutoMap()));
 
             if (!res.ShardsAcknowledged)
-                throw new InvalidOperationException("Could not create index");
+                throw new ResponseException<CreateIndexResponse>("Could not create index", res);
 
             return new TmpIndexLife<TDoc>(client, resultIndexName)
             {
