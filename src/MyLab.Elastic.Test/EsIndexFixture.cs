@@ -18,7 +18,11 @@ namespace MyLab.Elastic.Test
         private TmpIndexLife<TDoc> _index;
         private readonly ElasticClient _client;
 
-        public IIndexSpecificEsManager Manager { get; private set; }
+        public IIndexSpecificEsSearcher<TDoc> Searcher { get; private set; }
+        public IIndexSpecificEsIndexer<TDoc> Indexer { get; private set; }
+        public IEsManager Manager{ get; private set; }
+
+        public string IndexName => _index?.IndexName;
 
         /// <summary>
         /// Test output. Set to get logs.
@@ -61,7 +65,10 @@ namespace MyLab.Elastic.Test
         public async Task InitializeAsync()
         {
             _index = await TmpIndexLife<TDoc>.CreateAsync(_client);
-            Manager = new TestEsManager(_client).ForIndex(_index.IndexName);
+            
+            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
+            Manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
+            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
         }
 
         public async Task DisposeAsync()

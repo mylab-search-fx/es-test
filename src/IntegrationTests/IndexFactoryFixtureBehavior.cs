@@ -20,11 +20,10 @@ namespace IntegrationTests
         public async Task ShouldCreateIndex()
         {
             //Act
-            var indexResp = await _indexFactory.UseTmpIndex(mgr => mgr.Client.Indices.GetAsync(mgr.IndexName));
-            var found = indexResp.Indices.Values.FirstOrDefault();
+            var indexExist = await _indexFactory.UseTmpIndex(srv => srv.Manager.IsIndexExistsAsync(srv.IndexName));
 
             //Assert
-            Assert.NotNull(found);
+            Assert.True(indexExist);
         }
     }
 }

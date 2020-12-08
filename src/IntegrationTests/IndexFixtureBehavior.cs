@@ -1,9 +1,5 @@
-using System;
-using System.Linq;
 using System.Threading.Tasks;
-using MyLab.Elastic;
 using MyLab.Elastic.Test;
-using Nest;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,11 +19,10 @@ namespace IntegrationTests
         public async Task ShouldCreateIndex()
         {
             //Act
-            var indexResp = await _fixture.Manager.Client.Indices.GetAsync(_fixture.Manager.IndexName);
-            var found = indexResp.Indices.Values.FirstOrDefault();
+            var indexFound = await _fixture.Manager.IsIndexExistsAsync(_fixture.IndexName);
 
             //Assert
-            Assert.NotNull(found);
+            Assert.True(indexFound);
         }
     }
 }

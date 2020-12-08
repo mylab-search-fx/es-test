@@ -1,1 +1,1 @@
-docker-compose -p indexer-app-test up -d
+docker-compose up -d

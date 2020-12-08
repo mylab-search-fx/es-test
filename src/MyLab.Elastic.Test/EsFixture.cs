@@ -50,7 +50,7 @@ namespace MyLab.Elastic.Test
 
         public Task InitializeAsync()
         {
-            Manager = new TestEsManager(_client);
+            Manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
 
             return Task.CompletedTask;
         }
