@@ -10,14 +10,19 @@ namespace MyLab.Elastic.Test
     /// <summary>
     /// CreateAsync tmp index with specified model mapping
     /// </summary>
-    public class EsIndexFixture<TDoc> : IAsyncLifetime
+    public class EsIndexFixture<TDoc, TConnectionProvider> : IAsyncLifetime
         where TDoc : class
+        where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
         private TmpIndexLife<TDoc> _index;
         private readonly ElasticClient _client;
 
-        public IIndexSpecificEsManager Manager { get; private set; }
+        public IIndexSpecificEsSearcher<TDoc> Searcher { get; private set; }
+        public IIndexSpecificEsIndexer<TDoc> Indexer { get; private set; }
+        public IEsManager Manager{ get; private set; }
+
+        public string IndexName => _index?.IndexName;
 
         /// <summary>
         /// Test output. Set to get logs.
@@ -25,18 +30,18 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
         public EsIndexFixture()
-            :this(new EnvironmentConnectionProvider())
+            :this(new TConnectionProvider())
         {
             
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
-        protected EsIndexFixture(IConnectionProvider connectionProvider)
+        protected EsIndexFixture(TConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
             
@@ -44,8 +49,14 @@ namespace MyLab.Elastic.Test
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             {
-                if (Output != null)
-                    TestEsLogger.Log(Output, details);
+                try
+                {
+                    Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
+                }
+                catch (InvalidOperationException e)  when (e.Message == "There is no currently active test.")
+                {
+                    //Do nothing
+                }
             });
 
             _client = new ElasticClient(settings);
@@ -54,7 +65,10 @@ namespace MyLab.Elastic.Test
         public async Task InitializeAsync()
         {
             _index = await TmpIndexLife<TDoc>.CreateAsync(_client);
-            Manager = new TestEsManager(_client).ForIndex(_index.IndexName);
+            
+            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
+            Manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
+            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
         }
 
         public async Task DisposeAsync()

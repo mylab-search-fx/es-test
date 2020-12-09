@@ -18,21 +18,18 @@ namespace MyLab.Elastic.Test
             _client = client;
             IndexName = indexName;
         }
-
-        public static Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client)
-        {
-            return CreateAsync(client, "test-" + Guid.NewGuid().ToString("N"));
-        }
         
-        public static async Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client, string indexName)
+        public static async Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client, string indexName = null)
         {
+            var resultIndexName = indexName ?? "test-" + Guid.NewGuid().ToString("N");
+
             var res = await client.Indices.CreateAsync(
-                indexName, cd => cd.Map<TDoc>(md => md.AutoMap()));
+                resultIndexName, cd => cd.Map<TDoc>(md => md.AutoMap()));
 
             if (!res.ShardsAcknowledged)
-                throw new InvalidOperationException("Could not create index");
+                throw new ResponseException("Could not create index", res);
 
-            return new TmpIndexLife<TDoc>(client, indexName)
+            return new TmpIndexLife<TDoc>(client, resultIndexName)
             {
                 CreationResponse = res
             };

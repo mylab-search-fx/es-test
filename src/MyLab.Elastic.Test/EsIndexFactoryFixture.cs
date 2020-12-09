@@ -9,8 +9,9 @@ namespace MyLab.Elastic.Test
     /// <summary>
     /// CreateAsync tmp index factory with specified model mapping
     /// </summary>
-    public class EsIndexFactoryFixture<TDoc> : IDisposable
+    public class EsIndexFactoryFixture<TDoc, TConnectionProvider> : IDisposable
         where TDoc : class
+        where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
         private readonly ElasticClient _client;
@@ -21,18 +22,18 @@ namespace MyLab.Elastic.Test
         public ITestOutputHelper Output { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFactoryFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
         public EsIndexFactoryFixture()
-            : this(new EnvironmentConnectionProvider())
+            : this(new TConnectionProvider())
         {
 
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="EsIndexFixture{TDoc}"/>
+        /// Initializes a new instance of <see cref="EsIndexFactoryFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
-        protected EsIndexFactoryFixture(IConnectionProvider connectionProvider)
+        protected EsIndexFactoryFixture(TConnectionProvider connectionProvider)
         {
             _connection = connectionProvider.Provide();
             
@@ -40,8 +41,7 @@ namespace MyLab.Elastic.Test
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             {
-                if (Output != null)
-                    TestEsLogger.Log(Output, details);
+                Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
 
             _client = new ElasticClient(settings);
@@ -58,25 +58,41 @@ namespace MyLab.Elastic.Test
         /// <summary>
         /// Creates index for the duration of action performing
         /// </summary>
-        public async Task UseTmpIndex(Func<IIndexSpecificEsManager, Task> action, string tmpIndexName = null)
+        public async Task UseTmpIndex(Func<TestServices<TDoc>, Task> action, string tmpIndexName = null)
         {
             await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
-            var mgr = new TestEsManager(_client).ForIndex(indexLife.IndexName);
+            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
+            var manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
+            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
 
-            await action(mgr);
+            await action(new TestServices<TDoc>
+            {
+                IndexName = indexLife.IndexName,
+                Indexer = indexer,
+                Manager = manager,
+                Searcher = searcher
+            });
         }
 
         /// <summary>
         /// Creates index for the duration of function performing
         /// </summary>
-        public async Task<TRes> UseTmpIndex<TRes>(Func<IIndexSpecificEsManager, Task<TRes>> func, string tmpIndexName = null)
+        public async Task<TRes> UseTmpIndex<TRes>(Func<TestServices<TDoc>, Task<TRes>> func, string tmpIndexName = null)
         {
             await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
-            var mgr = new TestEsManager(_client).ForIndex(indexLife.IndexName);
+            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
+            var manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
+            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
 
-            return await func(mgr);
+            return await func(new TestServices<TDoc>
+            {
+                IndexName = indexLife.IndexName,
+                Indexer = indexer,
+                Manager = manager,
+                Searcher = searcher
+            });
         }
 
         public void Dispose()
