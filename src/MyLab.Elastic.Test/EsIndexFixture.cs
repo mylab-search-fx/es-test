@@ -66,9 +66,9 @@ namespace MyLab.Elastic.Test
         {
             _index = await TmpIndexLife<TDoc>.CreateAsync(_client);
             
-            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
+            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(_index.IndexName);
             Manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
-            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
+            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(_index.IndexName);
         }
 
         public async Task DisposeAsync()

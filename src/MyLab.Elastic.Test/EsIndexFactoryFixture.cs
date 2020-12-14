@@ -62,9 +62,9 @@ namespace MyLab.Elastic.Test
         {
             await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
-            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
+            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
             var manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
-            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
+            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
 
             await action(new TestServices<TDoc>
             {
@@ -82,9 +82,9 @@ namespace MyLab.Elastic.Test
         {
             await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
-            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
+            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
             var manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
-            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(indexLife.IndexName);
+            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
 
             return await func(new TestServices<TDoc>
             {
