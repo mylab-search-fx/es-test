@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{1D799015-9EB4-491A-B0F3-296012A3D0EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLab.Elastic.Test", "MyLab.Elastic.Test\MyLab.Elastic.Test.csproj", "{C28D02D1-D99A-4BED-8694-8015F4B3F0BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLab.Search.EsTest", "MyLab.Search.EsTest\MyLab.Search.EsTest.csproj", "{C28D02D1-D99A-4BED-8694-8015F4B3F0BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

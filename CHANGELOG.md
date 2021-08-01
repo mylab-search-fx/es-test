@@ -4,6 +4,13 @@
 
 Формат лога изменений базируется на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.4.9] - 2021-08-01
+
+### Изменено 
+
+* Переключено с `MyLab.Elastic` на `MyLab.Search.EsAdapter`
+* Переименовано с `MyLab.Elastic.Test` на `MyLab.Search.EsTest`
+
 ## [1.3.9] - 2020-12-14
 
 ### Изменено 

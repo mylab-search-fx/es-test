@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MyLab.Search.EsAdapter;
 using Nest;
 
-namespace MyLab.Elastic.Test
+namespace MyLab.Search.EsTest
 {
     class TmpIndexLife<TDoc> : IAsyncDisposable
         where TDoc : class

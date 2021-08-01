@@ -1,4 +1,6 @@
-﻿namespace MyLab.Elastic.Test
+﻿using MyLab.Search.EsAdapter;
+
+namespace MyLab.Search.EsTest
 {
     public class TestServices<TDoc>
         where TDoc : class

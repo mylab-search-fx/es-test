@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
-using MyLab.Elastic.Test;
+using MyLab.Search.EsTest;
 using Xunit;
 using Xunit.Abstractions;
 

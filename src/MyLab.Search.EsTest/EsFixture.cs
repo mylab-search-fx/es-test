@@ -1,10 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Elasticsearch.Net;
+using MyLab.Search.EsAdapter;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MyLab.Elastic.Test
+namespace MyLab.Search.EsTest
 {
     /// <summary>
     /// Provides manager to work with remote ES instance

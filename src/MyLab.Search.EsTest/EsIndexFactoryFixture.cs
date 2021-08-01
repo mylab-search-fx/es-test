@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using MyLab.Search.EsAdapter;
 using Nest;
 using Xunit.Abstractions;
 
-namespace MyLab.Elastic.Test
+namespace MyLab.Search.EsTest
 {
     /// <summary>
     /// CreateAsync tmp index factory with specified model mapping
