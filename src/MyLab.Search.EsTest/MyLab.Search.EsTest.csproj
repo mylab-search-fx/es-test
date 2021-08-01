@@ -9,9 +9,9 @@
     <RepositoryUrl>https://github.com/mylab-search-fx/es-test.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/mylab-search-fx/es-test</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>1.4.9</Version>
-    <AssemblyVersion>1.4.9.0108</AssemblyVersion>
-    <FileVersion>1.4.9.0108</FileVersion>
+    <Version>1.4.10</Version>
+    <AssemblyVersion>1.4.10.0108</AssemblyVersion>
+    <FileVersion>1.4.10.0108</FileVersion>
     <PackageIcon>analytics.png</PackageIcon>
     <PackageIconUrl />
   </PropertyGroup>

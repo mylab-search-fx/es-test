@@ -14,9 +14,10 @@ namespace MyLab.Search.EsTest
         where TConnectionProvider : IConnectionProvider, new()
     {
         private readonly IConnectionPool _connection;
-        private readonly ElasticClient _client;
 
         public IEsManager Manager { get; private set; }
+
+        public ElasticClient EsClient { get; }
 
         /// <summary>
         /// Test output. Set to get logs.
@@ -46,12 +47,12 @@ namespace MyLab.Search.EsTest
                 Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
 
-            _client = new ElasticClient(settings);
+            EsClient = new ElasticClient(settings);
         }
 
         public Task InitializeAsync()
         {
-            Manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
+            Manager = new EsManager(new SingleEsClientProvider(EsClient), (ElasticsearchOptions)null);
 
             return Task.CompletedTask;
         }

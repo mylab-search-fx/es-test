@@ -4,7 +4,11 @@
 
 Формат лога изменений базируется на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.4.9] - 2021-08-01
+## [1.4.10] - 2021-08-01
+
+### Добавлено
+
+* Добавлен `ElasticSearch` клиент в `EsFixture` и `EsIndexFixture` через свойство `EsClient` 
 
 ### Изменено 
 
