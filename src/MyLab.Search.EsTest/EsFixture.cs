@@ -50,6 +50,16 @@ namespace MyLab.Search.EsTest
             EsClient = new ElasticClient(settings);
         }
 
+        public IEsSearcher<TDoc> CreateSearcher<TDoc>() where TDoc : class
+        {
+            return new EsSearcher<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions) null);
+        }
+
+        public IEsIndexer<TDoc> CreateIndexer<TDoc>() where TDoc : class
+        {
+            return new EsIndexer<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null);
+        }
+
         public Task InitializeAsync()
         {
             Manager = new EsManager(new SingleEsClientProvider(EsClient), (ElasticsearchOptions)null);
