@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyLab.Elastic.Test\MyLab.Elastic.Test.csproj" />
+    <ProjectReference Include="..\MyLab.Search.EsTest\MyLab.Search.EsTest.csproj" />
   </ItemGroup>
 
 </Project>

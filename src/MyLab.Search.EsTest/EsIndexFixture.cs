@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using MyLab.Search.EsAdapter;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace MyLab.Elastic.Test
+namespace MyLab.Search.EsTest
 {
     /// <summary>
     /// CreateAsync tmp index with specified model mapping
@@ -16,11 +17,12 @@ namespace MyLab.Elastic.Test
     {
         private readonly IConnectionPool _connection;
         private TmpIndexLife<TDoc> _index;
-        private readonly ElasticClient _client;
 
         public IIndexSpecificEsSearcher<TDoc> Searcher { get; private set; }
         public IIndexSpecificEsIndexer<TDoc> Indexer { get; private set; }
         public IEsManager Manager{ get; private set; }
+
+        public ElasticClient EsClient { get; }
 
         public string IndexName => _index?.IndexName;
 
@@ -59,16 +61,16 @@ namespace MyLab.Elastic.Test
                 }
             });
 
-            _client = new ElasticClient(settings);
+            EsClient = new ElasticClient(settings);
         }
 
         public async Task InitializeAsync()
         {
-            _index = await TmpIndexLife<TDoc>.CreateAsync(_client);
+            _index = await TmpIndexLife<TDoc>.CreateAsync(EsClient);
             
-            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
-            Manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
-            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null).ForIndex(_index.IndexName);
+            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null).ForIndex(_index.IndexName);
+            Manager = new EsManager(new SingleEsClientProvider(EsClient), (ElasticsearchOptions)null);
+            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null).ForIndex(_index.IndexName);
         }
 
         public async Task DisposeAsync()

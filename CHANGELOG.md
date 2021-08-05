@@ -4,6 +4,24 @@
 
 Формат лога изменений базируется на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.4.11] - 2021-08-05
+
+### Добавлено
+
+* Добавлен `ElasticSearch` клиент в `EsFixture` и `EsIndexFixture` через свойство `EsClient` 
+* Возможность создания индексатора и искателя через `EsFixture`
+
+### Изменено 
+
+* Переключено с `MyLab.Elastic` на `MyLab.Search.EsAdapter`
+* Переименовано с `MyLab.Elastic.Test` на `MyLab.Search.EsTest`
+
+## [1.3.9] - 2020-12-14
+
+### Изменено 
+
+* Обновлено `MyLab.Elastic` до `v1.4.14`
+
 ## [1.3.8] - 2020-12-09
 
 ### Добавлено

@@ -1,6 +1,6 @@
 ﻿using Elasticsearch.Net;
 
-namespace MyLab.Elastic.Test
+namespace MyLab.Search.EsTest
 {
     public interface IConnectionProvider
     {
