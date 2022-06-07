@@ -5,11 +5,11 @@ using Xunit.Abstractions;
 
 namespace IntegrationTests
 {
-    public class IndexFixtureBehavior : IClassFixture<EsIndexFixture<TestEntity, TestConnProvider>>
+    public class IndexFixtureBehavior : IClassFixture<EsIndexFixture<TestEntity, TestEsFixtureStrategy>>
     {
-        private readonly EsIndexFixture<TestEntity, TestConnProvider> _fixture;
+        private readonly EsIndexFixture<TestEntity, TestEsFixtureStrategy> _fixture;
 
-        public IndexFixtureBehavior(EsIndexFixture<TestEntity, TestConnProvider> fixture, ITestOutputHelper output)
+        public IndexFixtureBehavior(EsIndexFixture<TestEntity, TestEsFixtureStrategy> fixture, ITestOutputHelper output)
         {
             _fixture = fixture;
             fixture.Output = output;

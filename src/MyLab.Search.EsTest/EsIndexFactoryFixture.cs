@@ -10,9 +10,9 @@ namespace MyLab.Search.EsTest
     /// <summary>
     /// CreateAsync tmp index factory with specified model mapping
     /// </summary>
-    public class EsIndexFactoryFixture<TDoc, TConnectionProvider> : IDisposable
+    public class EsIndexFactoryFixture<TDoc, TStrategy> : IDisposable
         where TDoc : class
-        where TConnectionProvider : IConnectionProvider, new()
+        where TStrategy : IEsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
         private readonly ElasticClient _client;
@@ -26,7 +26,7 @@ namespace MyLab.Search.EsTest
         /// Initializes a new instance of <see cref="EsIndexFactoryFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
         public EsIndexFactoryFixture()
-            : this(new TConnectionProvider())
+            : this(new TStrategy())
         {
 
         }
@@ -34,9 +34,9 @@ namespace MyLab.Search.EsTest
         /// <summary>
         /// Initializes a new instance of <see cref="EsIndexFactoryFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
-        protected EsIndexFactoryFixture(TConnectionProvider connectionProvider)
+        protected EsIndexFactoryFixture(TStrategy strategy)
         {
-            _connection = connectionProvider.Provide();
+            _connection = strategy.ProvideConnection();
             
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
@@ -44,6 +44,8 @@ namespace MyLab.Search.EsTest
             {
                 Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
+
+            strategy.ApplyConnectionSettings(settings);
 
             _client = new ElasticClient(settings);
         }

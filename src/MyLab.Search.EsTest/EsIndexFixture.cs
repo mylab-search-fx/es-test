@@ -11,9 +11,9 @@ namespace MyLab.Search.EsTest
     /// <summary>
     /// CreateAsync tmp index with specified model mapping
     /// </summary>
-    public class EsIndexFixture<TDoc, TConnectionProvider> : IAsyncLifetime
+    public class EsIndexFixture<TDoc, TStrategy> : IAsyncLifetime
         where TDoc : class
-        where TConnectionProvider : IConnectionProvider, new()
+        where TStrategy : IEsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
         private TmpIndexLife<TDoc> _index;
@@ -35,7 +35,7 @@ namespace MyLab.Search.EsTest
         /// Initializes a new instance of <see cref="EsIndexFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
         public EsIndexFixture()
-            :this(new TConnectionProvider())
+            :this(new TStrategy())
         {
             
         }
@@ -43,9 +43,9 @@ namespace MyLab.Search.EsTest
         /// <summary>
         /// Initializes a new instance of <see cref="EsIndexFixture{TDoc, TConnectionProvider}"/>
         /// </summary>
-        protected EsIndexFixture(TConnectionProvider connectionProvider)
+        protected EsIndexFixture(TStrategy strategy)
         {
-            _connection = connectionProvider.Provide();
+            _connection = strategy.ProvideConnection();
             
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
@@ -60,6 +60,8 @@ namespace MyLab.Search.EsTest
                     //Do nothing
                 }
             });
+
+            strategy.ApplyConnectionSettings(settings);
 
             EsClient = new ElasticClient(settings);
         }

@@ -10,8 +10,8 @@ namespace MyLab.Search.EsTest
     /// <summary>
     /// Provides manager to work with remote ES instance
     /// </summary>
-    public class EsFixture<TConnectionProvider> : IAsyncLifetime
-        where TConnectionProvider : IConnectionProvider, new()
+    public class EsFixture<TStrategy> : IAsyncLifetime
+        where TStrategy : IEsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
 
@@ -28,7 +28,7 @@ namespace MyLab.Search.EsTest
         /// Initializes a new instance of <see cref="EsFixture{TConnectionProvider}"/>
         /// </summary>
         public EsFixture()
-            :this(new TConnectionProvider())
+            :this(new TStrategy())
         {
             
         }
@@ -36,9 +36,9 @@ namespace MyLab.Search.EsTest
         /// <summary>
         /// Initializes a new instance of <see cref="EsFixture{TConnectionProvider}"/>
         /// </summary>
-        protected EsFixture(TConnectionProvider connectionProvider)
+        protected EsFixture(TStrategy strategy)
         {
-            _connection = connectionProvider.Provide();
+            _connection = strategy.ProvideConnection();
             
             var settings = new ConnectionSettings(_connection);
             settings.DisableDirectStreaming();
@@ -46,6 +46,8 @@ namespace MyLab.Search.EsTest
             { 
                 Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
+
+            strategy.ApplyConnectionSettings(settings);
 
             EsClient = new ElasticClient(settings);
         }

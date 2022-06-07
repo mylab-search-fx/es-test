@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyLab.Search.EsAdapter" Version="1.5.13" />
+    <PackageReference Include="MyLab.Search.EsAdapter" Version="1.6.22" />
     <PackageReference Include="NEST" Version="7.10.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />

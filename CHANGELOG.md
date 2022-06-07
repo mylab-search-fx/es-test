@@ -4,6 +4,12 @@
 
 Формат лога изменений базируется на [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.5.11] - 2022-06-08
+
+### Изменено
+
+* Заменён `IConnectionProvider` на `IEsFixtureStrategy`, расширяющий функционал
+
 ## [1.4.11] - 2021-08-05
 
 ### Добавлено
