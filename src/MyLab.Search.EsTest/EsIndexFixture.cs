@@ -13,7 +13,7 @@ namespace MyLab.Search.EsTest
     /// </summary>
     public class EsIndexFixture<TDoc, TStrategy> : IAsyncLifetime
         where TDoc : class
-        where TStrategy : IEsFixtureStrategy, new()
+        where TStrategy : EsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
         private TmpIndexLife<TDoc> _index;
@@ -47,7 +47,7 @@ namespace MyLab.Search.EsTest
         {
             _connection = strategy.ProvideConnection();
             
-            var settings = new ConnectionSettings(_connection);
+            var settings = strategy.CreateConnectionSettings(_connection);
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             {
@@ -60,9 +60,7 @@ namespace MyLab.Search.EsTest
                     //Do nothing
                 }
             });
-
-            strategy.ApplyConnectionSettings(settings);
-
+            
             EsClient = new ElasticClient(settings);
         }
 

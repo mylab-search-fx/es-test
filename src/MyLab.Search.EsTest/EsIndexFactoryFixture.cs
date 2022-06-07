@@ -12,7 +12,7 @@ namespace MyLab.Search.EsTest
     /// </summary>
     public class EsIndexFactoryFixture<TDoc, TStrategy> : IDisposable
         where TDoc : class
-        where TStrategy : IEsFixtureStrategy, new()
+        where TStrategy : EsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
         private readonly ElasticClient _client;
@@ -38,15 +38,13 @@ namespace MyLab.Search.EsTest
         {
             _connection = strategy.ProvideConnection();
             
-            var settings = new ConnectionSettings(_connection);
+            var settings = strategy.CreateConnectionSettings(_connection);
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             {
                 Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
-
-            strategy.ApplyConnectionSettings(settings);
-
+            
             _client = new ElasticClient(settings);
         }
 

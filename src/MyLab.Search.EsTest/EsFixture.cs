@@ -11,7 +11,7 @@ namespace MyLab.Search.EsTest
     /// Provides manager to work with remote ES instance
     /// </summary>
     public class EsFixture<TStrategy> : IAsyncLifetime
-        where TStrategy : IEsFixtureStrategy, new()
+        where TStrategy : EsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
 
@@ -40,14 +40,12 @@ namespace MyLab.Search.EsTest
         {
             _connection = strategy.ProvideConnection();
             
-            var settings = new ConnectionSettings(_connection);
+            var settings = strategy.CreateConnectionSettings(_connection);
             settings.DisableDirectStreaming();
             settings.OnRequestCompleted(details =>
             { 
                 Output?.WriteLine(ApiCallDumper.ApiCallToDump(details));
             });
-
-            strategy.ApplyConnectionSettings(settings);
 
             EsClient = new ElasticClient(settings);
         }
