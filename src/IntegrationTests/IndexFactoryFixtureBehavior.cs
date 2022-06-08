@@ -20,7 +20,7 @@ namespace IntegrationTests
         public async Task ShouldCreateIndex()
         {
             //Act
-            var indexExist = await _indexFactory.UseTmpIndex(srv => srv.Manager.IsIndexExistsAsync(srv.IndexName));
+            var indexExist = await _indexFactory.UseTmpIndexAsync(srv => srv.IndexTools.IsIndexExistsAsync());
 
             //Assert
             Assert.True(indexExist);

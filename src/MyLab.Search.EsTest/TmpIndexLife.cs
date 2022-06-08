@@ -28,7 +28,7 @@ namespace MyLab.Search.EsTest
                 resultIndexName, cd => cd.Map<TDoc>(md => md.AutoMap()));
 
             if (!res.ShardsAcknowledged)
-                throw new ResponseException("Could not create index", res);
+                throw new InvalidOperationException("Unable to create index");
 
             return new TmpIndexLife<TDoc>(client, resultIndexName)
             {

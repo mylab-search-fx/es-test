@@ -2,6 +2,9 @@
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using MyLab.Search.EsAdapter;
+using MyLab.Search.EsAdapter.Indexing;
+using MyLab.Search.EsAdapter.Inter;
+using MyLab.Search.EsAdapter.Search;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
@@ -18,9 +21,9 @@ namespace MyLab.Search.EsTest
         private readonly IConnectionPool _connection;
         private TmpIndexLife<TDoc> _index;
 
-        public IIndexSpecificEsSearcher<TDoc> Searcher { get; private set; }
-        public IIndexSpecificEsIndexer<TDoc> Indexer { get; private set; }
-        public IEsManager Manager{ get; private set; }
+        public IEsIndexTools<TDoc> IndexTools { get; private set; }
+        public IEsSearcher<TDoc> Searcher { get; private set; }
+        public IEsIndexer<TDoc> Indexer { get; private set; }
 
         public ElasticClient EsClient { get; }
 
@@ -67,10 +70,13 @@ namespace MyLab.Search.EsTest
         public async Task InitializeAsync()
         {
             _index = await TmpIndexLife<TDoc>.CreateAsync(EsClient);
-            
-            Searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null).ForIndex(_index.IndexName);
-            Manager = new EsManager(new SingleEsClientProvider(EsClient), (ElasticsearchOptions)null);
-            Indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null).ForIndex(_index.IndexName);
+
+            var clientProvider = new SingleEsClientProvider(EsClient);
+            IIndexNameProvider indexNameProvider = new SingleIndexNameProvider(_index.IndexName);
+
+            IndexTools= new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider);
+            Searcher = new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider);
+            Indexer = new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider);
         }
 
         public async Task DisposeAsync()

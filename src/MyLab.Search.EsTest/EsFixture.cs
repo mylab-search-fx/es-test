@@ -1,6 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Elasticsearch.Net;
 using MyLab.Search.EsAdapter;
+using MyLab.Search.EsAdapter.Indexing;
+using MyLab.Search.EsAdapter.Inter;
+using MyLab.Search.EsAdapter.Search;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
@@ -8,15 +11,28 @@ using Xunit.Abstractions;
 namespace MyLab.Search.EsTest
 {
     /// <summary>
-    /// Provides manager to work with remote ES instance
+    /// Provides services to work with remote ES instance
     /// </summary>
     public class EsFixture<TStrategy> : IAsyncLifetime
         where TStrategy : EsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
 
-        public IEsManager Manager { get; private set; }
-
+        /// <summary>
+        /// Indexes the documents
+        /// </summary>
+        public IEsIndexer Indexer { get; }
+        /// <summary>
+        /// Tools to manage indexes
+        /// </summary>
+        public IEsIndexTools IndexTools { get; }
+        /// <summary>
+        /// Performs search requests
+        /// </summary>
+        public IEsSearcher Searcher { get; }
+        /// <summary>
+        /// NEST ES client
+        /// </summary>
         public ElasticClient EsClient { get; }
 
         /// <summary>
@@ -48,22 +64,16 @@ namespace MyLab.Search.EsTest
             });
 
             EsClient = new ElasticClient(settings);
-        }
 
-        public IEsSearcher<TDoc> CreateSearcher<TDoc>() where TDoc : class
-        {
-            return new EsSearcher<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions) null);
-        }
+            var clientProvider = new SingleEsClientProvider(EsClient);
 
-        public IEsIndexer<TDoc> CreateIndexer<TDoc>() where TDoc : class
-        {
-            return new EsIndexer<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null);
+            Indexer = new EsIndexer(clientProvider);
+            Searcher = new EsSearcher(clientProvider);
+            IndexTools = new EsIndexTools(clientProvider);
         }
 
         public Task InitializeAsync()
         {
-            Manager = new EsManager(new SingleEsClientProvider(EsClient), (ElasticsearchOptions)null);
-
             return Task.CompletedTask;
         }
 

@@ -2,13 +2,16 @@
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using MyLab.Search.EsAdapter;
+using MyLab.Search.EsAdapter.Indexing;
+using MyLab.Search.EsAdapter.Inter;
+using MyLab.Search.EsAdapter.Search;
 using Nest;
 using Xunit.Abstractions;
 
 namespace MyLab.Search.EsTest
 {
     /// <summary>
-    /// CreateAsync tmp index factory with specified model mapping
+    /// Create tmp index factory with specified model mapping
     /// </summary>
     public class EsIndexFactoryFixture<TDoc, TStrategy> : IDisposable
         where TDoc : class
@@ -59,41 +62,37 @@ namespace MyLab.Search.EsTest
         /// <summary>
         /// Creates index for the duration of action performing
         /// </summary>
-        public async Task UseTmpIndex(Func<TestServices<TDoc>, Task> action, string tmpIndexName = null)
+        public async Task UseTmpIndexASync(Func<TestServices<TDoc>, Task> action, string tmpIndexName = null)
         {
             await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
+            
+            var clientProvider = new SingleEsClientProvider(_client);
+            var indexNameProvider = new SingleIndexNameProvider(indexLife.IndexName);
 
-            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
-            var manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
-            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
-
-            await action(new TestServices<TDoc>
-            {
-                IndexName = indexLife.IndexName,
-                Indexer = indexer,
-                Manager = manager,
-                Searcher = searcher
-            });
+            await action(new TestServices<TDoc>(
+                indexLife.IndexName,
+                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
+                new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
+                ));
         }
 
         /// <summary>
         /// Creates index for the duration of function performing
         /// </summary>
-        public async Task<TRes> UseTmpIndex<TRes>(Func<TestServices<TDoc>, Task<TRes>> func, string tmpIndexName = null)
+        public async Task<TRes> UseTmpIndexAsync<TRes>(Func<TestServices<TDoc>, Task<TRes>> func, string tmpIndexName = null)
         {
             await using var indexLife = await TmpIndexLife<TDoc>.CreateAsync(_client, tmpIndexName);
 
-            var searcher = new EsSearcher<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
-            var manager = new EsManager(new SingleEsClientProvider(_client), (ElasticsearchOptions)null);
-            var indexer = new EsIndexer<TDoc>(new SingleEsClientProvider(_client), null, (ElasticsearchOptions)null).ForIndex(indexLife.IndexName);
+            var clientProvider = new SingleEsClientProvider(_client);
+            var indexNameProvider = new SingleIndexNameProvider(indexLife.IndexName);
 
-            return await func(new TestServices<TDoc>
-            {
-                IndexName = indexLife.IndexName,
-                Indexer = indexer,
-                Manager = manager,
-                Searcher = searcher
-            });
+            return await func(new TestServices<TDoc>(
+                indexLife.IndexName,
+                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
+                new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
+            ));
         }
 
         public void Dispose()
