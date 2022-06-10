@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Elasticsearch.Net;
 using MyLab.Search.EsAdapter;
 using MyLab.Search.EsAdapter.Indexing;
@@ -50,6 +51,53 @@ namespace MyLab.Search.EsTest
         }
 
         /// <summary>
+        /// Creates temp index 
+        /// </summary>
+        public async Task<TmpIndex<TDoc>> CreateTmpIndex<TDoc>(string tmpIndexName = null)
+            where TDoc: class
+        {
+            return await TmpIndex<TDoc>.CreateAsync(EsClient, tmpIndexName);
+        }
+
+        /// <summary>
+        /// Creates index for the duration of action performing
+        /// </summary>
+        public async Task UseTmpIndexASync<TDoc>(Func<TestServices<TDoc>, Task> action, string tmpIndexName = null)
+            where TDoc : class
+        {
+            await using var indexLife = await TmpIndex<TDoc>.CreateAsync(EsClient, tmpIndexName);
+
+            var clientProvider = new SingleEsClientProvider(EsClient);
+            var indexNameProvider = new SingleIndexNameProvider(indexLife.IndexName);
+
+            await action(new TestServices<TDoc>(
+                indexLife.IndexName,
+                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
+                new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
+                ));
+        }
+
+        /// <summary>
+        /// Creates index for the duration of function performing
+        /// </summary>
+        public async Task<TRes> UseTmpIndexAsync<TDoc, TRes>(Func<TestServices<TDoc>, Task<TRes>> func, string tmpIndexName = null)
+            where TDoc : class
+        {
+            await using var indexLife = await TmpIndex<TDoc>.CreateAsync(EsClient, tmpIndexName);
+
+            var clientProvider = new SingleEsClientProvider(EsClient);
+            var indexNameProvider = new SingleIndexNameProvider(indexLife.IndexName);
+
+            return await func(new TestServices<TDoc>(
+                indexLife.IndexName,
+                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
+                new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
+            ));
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="EsFixture{TConnectionProvider}"/>
         /// </summary>
         protected EsFixture(TStrategy strategy)
@@ -72,11 +120,13 @@ namespace MyLab.Search.EsTest
             IndexTools = new EsIndexTools(clientProvider);
         }
 
+        /// <inheritdoc />
         public Task InitializeAsync()
         {
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public Task DisposeAsync()
         {
             _connection?.Dispose();

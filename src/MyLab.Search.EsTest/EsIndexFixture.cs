@@ -19,14 +19,29 @@ namespace MyLab.Search.EsTest
         where TStrategy : EsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
-        private TmpIndexLife<TDoc> _index;
+        private TmpIndex<TDoc> _index;
 
+        /// <summary>
+        /// Specific index tools <see cref="IEsIndexTools{TDoc}"/>
+        /// </summary>
         public IEsIndexTools<TDoc> IndexTools { get; private set; }
+        /// <summary>
+        /// Specific index searcher <see cref="IEsSearcher{TDoc}"/>
+        /// </summary>
         public IEsSearcher<TDoc> Searcher { get; private set; }
+        /// <summary>
+        /// Specific index indexer <see cref="IEsIndexer{TDoc}"/>
+        /// </summary>
         public IEsIndexer<TDoc> Indexer { get; private set; }
 
+        /// <summary>
+        /// Underline Elasticsearch client
+        /// </summary>
         public ElasticClient EsClient { get; }
 
+        /// <summary>
+        /// Index name
+        /// </summary>
         public string IndexName => _index?.IndexName;
 
         /// <summary>
@@ -67,9 +82,10 @@ namespace MyLab.Search.EsTest
             EsClient = new ElasticClient(settings);
         }
 
+        /// <inheritdoc />
         public async Task InitializeAsync()
         {
-            _index = await TmpIndexLife<TDoc>.CreateAsync(EsClient);
+            _index = await TmpIndex<TDoc>.CreateAsync(EsClient);
 
             var clientProvider = new SingleEsClientProvider(EsClient);
             IIndexNameProvider indexNameProvider = new SingleIndexNameProvider(_index.IndexName);
@@ -79,6 +95,7 @@ namespace MyLab.Search.EsTest
             Indexer = new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider);
         }
 
+        /// <inheritdoc />
         public async Task DisposeAsync()
         {
             await _index.DisposeAsync();

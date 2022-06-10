@@ -1,26 +1,40 @@
 ﻿using System;
 using System.Threading.Tasks;
-using MyLab.Search.EsAdapter;
 using Nest;
 
 namespace MyLab.Search.EsTest
 {
-    class TmpIndexLife<TDoc> : IAsyncDisposable
+    /// <summary>
+    /// Manage tmp index life
+    /// </summary>
+    public class TmpIndex<TDoc> : IAsyncDisposable
         where TDoc : class
     {
         private readonly ElasticClient _client;
 
+        /// <summary>
+        /// Index name
+        /// </summary>
         public string IndexName { get; }
 
+        /// <summary>
+        /// Index creation response
+        /// </summary>
         public IResponse CreationResponse { get; private set; }
 
-        TmpIndexLife(ElasticClient client, string indexName)
+        /// <summary>
+        /// Initializes a new instance of <see cref="TmpIndex{TDoc}"/>
+        /// </summary>
+        TmpIndex(ElasticClient client, string indexName)
         {
             _client = client;
             IndexName = indexName;
         }
         
-        public static async Task<TmpIndexLife<TDoc>> CreateAsync(ElasticClient client, string indexName = null)
+        /// <summary>
+        /// Creates an index 
+        /// </summary>
+        public static async Task<TmpIndex<TDoc>> CreateAsync(ElasticClient client, string indexName = null)
         {
             var resultIndexName = indexName ?? "test-" + Guid.NewGuid().ToString("N");
 
@@ -30,12 +44,13 @@ namespace MyLab.Search.EsTest
             if (!res.ShardsAcknowledged)
                 throw new InvalidOperationException("Unable to create index");
 
-            return new TmpIndexLife<TDoc>(client, resultIndexName)
+            return new TmpIndex<TDoc>(client, resultIndexName)
             {
                 CreationResponse = res
             };
         }
 
+        /// <inheritdoc />
         public ValueTask DisposeAsync()
         {
             return new ValueTask(_client.Indices.DeleteAsync(IndexName));
