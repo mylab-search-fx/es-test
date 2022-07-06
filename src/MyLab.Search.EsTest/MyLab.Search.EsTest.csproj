@@ -9,16 +9,16 @@
     <RepositoryUrl>https://github.com/mylab-search-fx/es-test.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/mylab-search-fx/es-test</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>2.0.1</Version>
-    <AssemblyVersion>2.0.1.1006</AssemblyVersion>
-    <FileVersion>2.0.1.1006</FileVersion>
+    <Version>2.0.2</Version>
+    <AssemblyVersion>2.0.2.0607</AssemblyVersion>
+    <FileVersion>2.0.2.0607</FileVersion>
     <PackageIcon>analytics.png</PackageIcon>
     <PackageIconUrl />
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyLab.Search.EsAdapter" Version="2.0.2" />
+    <PackageReference Include="MyLab.Search.EsAdapter" Version="2.0.5" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     <PackageReference Include="xunit.extensibility.core" Version="2.4.0" />
     <!--<PackageReference Include="xunit" Version="2.4.0" />-->
