@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Elasticsearch.Net;
 using MyLab.Search.EsAdapter;
+using MyLab.Search.EsAdapter.Indexing;
+using MyLab.Search.EsAdapter.Inter;
+using MyLab.Search.EsAdapter.Search;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
@@ -8,15 +12,28 @@ using Xunit.Abstractions;
 namespace MyLab.Search.EsTest
 {
     /// <summary>
-    /// Provides manager to work with remote ES instance
+    /// Provides services to work with remote ES instance
     /// </summary>
     public class EsFixture<TStrategy> : IAsyncLifetime
         where TStrategy : EsFixtureStrategy, new()
     {
         private readonly IConnectionPool _connection;
 
-        public IEsManager Manager { get; private set; }
-
+        /// <summary>
+        /// Indexes the documents
+        /// </summary>
+        public IEsIndexer Indexer { get; }
+        /// <summary>
+        /// Tools to manage indexes
+        /// </summary>
+        public IEsIndexTools IndexTools { get; }
+        /// <summary>
+        /// Performs search requests
+        /// </summary>
+        public IEsSearcher Searcher { get; }
+        /// <summary>
+        /// NEST ES client
+        /// </summary>
         public ElasticClient EsClient { get; }
 
         /// <summary>
@@ -34,6 +51,53 @@ namespace MyLab.Search.EsTest
         }
 
         /// <summary>
+        /// Creates temp index 
+        /// </summary>
+        public async Task<TmpIndex<TDoc>> CreateTmpIndex<TDoc>(string tmpIndexName = null)
+            where TDoc: class
+        {
+            return await TmpIndex<TDoc>.CreateAsync(EsClient, tmpIndexName);
+        }
+
+        /// <summary>
+        /// Creates index for the duration of action performing
+        /// </summary>
+        public async Task UseTmpIndexASync<TDoc>(Func<TestServices<TDoc>, Task> action, string tmpIndexName = null)
+            where TDoc : class
+        {
+            await using var indexLife = await TmpIndex<TDoc>.CreateAsync(EsClient, tmpIndexName);
+
+            var clientProvider = new SingleEsClientProvider(EsClient);
+            var indexNameProvider = new SingleIndexNameProvider(indexLife.IndexName);
+
+            await action(new TestServices<TDoc>(
+                indexLife.IndexName,
+                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
+                new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
+                ));
+        }
+
+        /// <summary>
+        /// Creates index for the duration of function performing
+        /// </summary>
+        public async Task<TRes> UseTmpIndexAsync<TDoc, TRes>(Func<TestServices<TDoc>, Task<TRes>> func, string tmpIndexName = null)
+            where TDoc : class
+        {
+            await using var indexLife = await TmpIndex<TDoc>.CreateAsync(EsClient, tmpIndexName);
+
+            var clientProvider = new SingleEsClientProvider(EsClient);
+            var indexNameProvider = new SingleIndexNameProvider(indexLife.IndexName);
+
+            return await func(new TestServices<TDoc>(
+                indexLife.IndexName,
+                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
+                new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
+            ));
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="EsFixture{TConnectionProvider}"/>
         /// </summary>
         protected EsFixture(TStrategy strategy)
@@ -48,25 +112,21 @@ namespace MyLab.Search.EsTest
             });
 
             EsClient = new ElasticClient(settings);
+
+            var clientProvider = new SingleEsClientProvider(EsClient);
+
+            Indexer = new EsIndexer(clientProvider);
+            Searcher = new EsSearcher(clientProvider);
+            IndexTools = new EsIndexTools(clientProvider);
         }
 
-        public IEsSearcher<TDoc> CreateSearcher<TDoc>() where TDoc : class
-        {
-            return new EsSearcher<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions) null);
-        }
-
-        public IEsIndexer<TDoc> CreateIndexer<TDoc>() where TDoc : class
-        {
-            return new EsIndexer<TDoc>(new SingleEsClientProvider(EsClient), null, (ElasticsearchOptions)null);
-        }
-
+        /// <inheritdoc />
         public Task InitializeAsync()
         {
-            Manager = new EsManager(new SingleEsClientProvider(EsClient), (ElasticsearchOptions)null);
-
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public Task DisposeAsync()
         {
             _connection?.Dispose();
