@@ -6,5 +6,5 @@
 ```
 Ознакомьтесь с последними изменениями в [журнале изменений](/changelog.md).
 
-Библиотека, содержащая инструменты для интеграционного тестирования компонентов, работающих с `Elastic Search` с использованием [MyLab.Search.EsTest](https://github.com/mylab-search-fx/es-adapter).
+Библиотека, содержащая инструменты для интеграционного тестирования компонентов, работающих с `Elastic Search` с использованием [MyLab.Search.EsAdapter](https://github.com/mylab-search-fx/es-adapter).
 
