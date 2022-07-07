@@ -1,25 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Copyright>Copyright (c) 2021 Andrey Osintsev &lt;ozzy.ext@gmail.com&gt;</Copyright>
+    <Copyright>Copyright (c) 2022 Andrey Osintsev &lt;ozzy.ext@gmail.com&gt;</Copyright>
     <Authors>Andrey O.</Authors>
     <RepositoryUrl>https://github.com/mylab-search-fx/es-test.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/mylab-search-fx/es-test</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>1.4.11</Version>
-    <AssemblyVersion>1.4.11.0208</AssemblyVersion>
-    <FileVersion>1.4.11.0208</FileVersion>
+    <Version>2.0.2</Version>
+    <AssemblyVersion>2.0.2.0607</AssemblyVersion>
+    <FileVersion>2.0.2.0607</FileVersion>
     <PackageIcon>analytics.png</PackageIcon>
     <PackageIconUrl />
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyLab.Search.EsAdapter" Version="1.5.13" />
-    <PackageReference Include="NEST" Version="7.10.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="MyLab.Search.EsAdapter" Version="2.0.5" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     <PackageReference Include="xunit.extensibility.core" Version="2.4.0" />
     <!--<PackageReference Include="xunit" Version="2.4.0" />-->
