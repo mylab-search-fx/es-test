@@ -5,6 +5,7 @@ using MyLab.Search.EsAdapter;
 using MyLab.Search.EsAdapter.Indexing;
 using MyLab.Search.EsAdapter.Inter;
 using MyLab.Search.EsAdapter.Search;
+using MyLab.Search.EsAdapter.Tools;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
@@ -72,7 +73,7 @@ namespace MyLab.Search.EsTest
 
             await action(new TestServices<TDoc>(
                 indexLife.IndexName,
-                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsSpecialIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
                 new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
                 new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
                 ));
@@ -91,7 +92,7 @@ namespace MyLab.Search.EsTest
 
             return await func(new TestServices<TDoc>(
                 indexLife.IndexName,
-                new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsSpecialIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
                 new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
                 new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
             ));

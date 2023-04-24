@@ -5,6 +5,7 @@ using MyLab.Search.EsAdapter;
 using MyLab.Search.EsAdapter.Indexing;
 using MyLab.Search.EsAdapter.Inter;
 using MyLab.Search.EsAdapter.Search;
+using MyLab.Search.EsAdapter.Tools;
 using Nest;
 using Xunit;
 using Xunit.Abstractions;
@@ -22,9 +23,9 @@ namespace MyLab.Search.EsTest
         private TmpIndex<TDoc> _index;
 
         /// <summary>
-        /// Specific index tools <see cref="IEsIndexTools{TDoc}"/>
+        /// Specific index tools <see cref="IEsSpecialIndexTools"/>
         /// </summary>
-        public IEsIndexTools<TDoc> IndexTools { get; private set; }
+        public IEsSpecialIndexTools IndexTools { get; private set; }
         /// <summary>
         /// Specific index searcher <see cref="IEsSearcher{TDoc}"/>
         /// </summary>
@@ -90,7 +91,7 @@ namespace MyLab.Search.EsTest
             var clientProvider = new SingleEsClientProvider(EsClient);
             IIndexNameProvider indexNameProvider = new SingleIndexNameProvider(_index.IndexName);
 
-            IndexTools= new EsIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider);
+            IndexTools= new EsSpecialIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider);
             Searcher = new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider);
             Indexer = new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider);
         }
