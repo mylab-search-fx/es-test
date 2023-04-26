@@ -9,14 +9,14 @@ namespace MyLab.Search.EsTest
         where TDoc : class
     {
         public string IndexName { get; }
-        public IEsSpecialIndexTools IndexTools { get; }
+        public IEsTools Tools { get; }
         public IEsSearcher<TDoc> Searcher { get;  }
         public IEsIndexer<TDoc> Indexer { get;  }
 
-        public TestServices(string indexName, IEsSpecialIndexTools indexTools, IEsIndexer<TDoc> indexer, IEsSearcher<TDoc> searcher)
+        public TestServices(string indexName, IEsTools tools, IEsIndexer<TDoc> indexer, IEsSearcher<TDoc> searcher)
         {
             IndexName = indexName;
-            IndexTools = indexTools;
+            Tools = tools;
             Indexer = indexer;
             Searcher = searcher;
         }

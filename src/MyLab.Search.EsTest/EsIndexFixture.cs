@@ -23,9 +23,9 @@ namespace MyLab.Search.EsTest
         private TmpIndex<TDoc> _index;
 
         /// <summary>
-        /// Specific index tools <see cref="IEsSpecialIndexTools"/>
+        /// Tools to manage ES
         /// </summary>
-        public IEsSpecialIndexTools IndexTools { get; private set; }
+        public IEsTools Tools { get; private set; }
         /// <summary>
         /// Specific index searcher <see cref="IEsSearcher{TDoc}"/>
         /// </summary>
@@ -91,7 +91,7 @@ namespace MyLab.Search.EsTest
             var clientProvider = new SingleEsClientProvider(EsClient);
             IIndexNameProvider indexNameProvider = new SingleIndexNameProvider(_index.IndexName);
 
-            IndexTools= new EsSpecialIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider);
+            Tools= new EsTools(clientProvider);
             Searcher = new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider);
             Indexer = new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider);
         }

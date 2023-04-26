@@ -19,7 +19,7 @@ namespace IntegrationTests
         public async Task ShouldCreateIndex()
         {
             //Act
-            var indexFound = await _fixture.IndexTools.IsIndexExistsAsync();
+            var indexFound = await _fixture.Tools.Index(_fixture.IndexName).ExistsAsync();
 
             //Assert
             Assert.True(indexFound);

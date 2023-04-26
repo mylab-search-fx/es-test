@@ -25,9 +25,9 @@ namespace MyLab.Search.EsTest
         /// </summary>
         public IEsIndexer Indexer { get; }
         /// <summary>
-        /// Tools to manage indexes
+        /// Tools to manage ES
         /// </summary>
-        public IEsIndexTools IndexTools { get; }
+        public IEsTools Tools { get; }
         /// <summary>
         /// Performs search requests
         /// </summary>
@@ -73,7 +73,7 @@ namespace MyLab.Search.EsTest
 
             await action(new TestServices<TDoc>(
                 indexLife.IndexName,
-                new EsSpecialIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsTools(clientProvider),
                 new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
                 new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
                 ));
@@ -92,7 +92,7 @@ namespace MyLab.Search.EsTest
 
             return await func(new TestServices<TDoc>(
                 indexLife.IndexName,
-                new EsSpecialIndexTools<TDoc>(new EsIndexTools(clientProvider), indexNameProvider),
+                new EsTools(clientProvider),
                 new EsIndexer<TDoc>(new EsIndexer(clientProvider), indexNameProvider),
                 new EsSearcher<TDoc>(new EsSearcher(clientProvider), indexNameProvider)
             ));
@@ -118,7 +118,7 @@ namespace MyLab.Search.EsTest
 
             Indexer = new EsIndexer(clientProvider);
             Searcher = new EsSearcher(clientProvider);
-            IndexTools = new EsIndexTools(clientProvider);
+            Tools = new EsTools(clientProvider);
         }
 
         /// <inheritdoc />
